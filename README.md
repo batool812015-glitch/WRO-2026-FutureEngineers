@@ -1,8 +1,8 @@
 # 🚗 WRO 2026 — Future Engineers
-### Team [Your Team Name] | Palestine 🇵🇸
+### Team NextGen Minds | Palestine 🇵🇸
 
 > An autonomous self-driving vehicle for WRO Future Engineers 2026,
-> powered by Computer Vision and Multi-Sensor Fusion.
+> powered by Multi-Sensor Fusion and real-time embedded control.
 
 ---
 
@@ -23,27 +23,27 @@
 
 | | Name | Role |
 |--|------|------|
-| 📸 | [Your Name] | Software — Python & Computer Vision |
-| 📸 | [Partner's Name] | Hardware & Firmware — C++ & ESP32 |
+| 📸 | Batool Ghanem | Software — Python & Computer Vision |
+| 📸 | Sara Abuarra | Hardware & Firmware — C++ & ESP32 |
 
-**Coach:** [Coach Name]
-**Institution:** [University/School Name]
+**Coach:** Osid Ali
+**Institution:** Birzeit University
 **Country:** Palestine 🇵🇸
 
 ---
 
 ## 🤖 Robot Overview
 
-A self-driving RC car built on an Ackermann chassis, powered by
-a Raspberry Pi 5 for real-time Computer Vision and an ESP32/Pico
-for low-level motor control. Navigation relies on Camera + ToF
-sensors + IMU fusion.
+A self-driving RC car built on an Ackermann chassis, controlled by
+an ESP32 microcontroller for real-time sensor fusion and motor control.
+Navigation relies on ToF wall-following, IMU-based turn execution,
+and color detection for lap counting.
 
 ### Specifications
 
 | Spec | Value |
 |------|-------|
-| Dimensions | 26cm × 16cm × 20cm |
+| Dimensions | ~26cm × 16cm × 20cm |
 | Weight | ~800g |
 | Max Speed | ~0.8 m/s |
 | Steering Accuracy | ±2° |
@@ -58,42 +58,37 @@ sensors + IMU fusion.
 
 | Component | Model | Function | Why We Chose It |
 |-----------|-------|----------|-----------------|
-| Main Processor | Raspberry Pi 5 (4GB) | Computer Vision + Decision Making | Best processing power in price range |
-| Motion Controller | RPi Pico 2 / ESP32 | PWM for motor & servo | Real-time C++ response |
-| Camera | RPi Camera Module 3 Wide | Track & obstacle detection | 120° FOV — sees turns early |
-| IMU | BNO085 | Rotation & heading measurement | 0.1° accuracy — perfect for turns |
-| Distance Sensors | VL53L1X × 2 | Left/right wall distance | 1mm accuracy — better than Ultrasonic |
-| Color Sensor | TCS34725 | Orange/blue line detection | Reliable & low cost |
-| Drive Motor | JGA25-370 + Encoder | Wheel propulsion | Encoder for precise distance tracking |
+| Main Controller | ESP32 | Decision making + sensor fusion | Available, affordable, sufficient for Open Challenge |
 | Steering Servo | MG996R | Front wheel steering | High torque + precision |
-| Motor Driver | BTS7960 | Motor power control | More efficient than L298N |
-| Battery | LiPo 3S 2200mAh | Power source | Stable voltage throughout the run |
-| Chassis | RC Ackermann Kit | Robot frame | Ackermann geometry for accuracy |
+| Drive Motor | DC Gear Motor 25mm | Rear wheel propulsion | Compatible with chassis kit |
+| Motor Driver | L298N | Motor power control | Available locally |
+| IMU | MPU-6050 (GY-521) | Rotation & heading measurement | Originally planned BNO085, switched to MPU-6050 — sufficient for competition duration (~3 min per run, minimal drift) |
+| Distance Sensors | VL53L1X × 2 | Left/right wall following | 1mm accuracy — better than Ultrasonic |
+| Color Sensor | TCS3472 | Orange/blue line detection | Reliable & low cost |
+| Step-down | XL6009E1 | Voltage regulation | Powers ESP32 from battery safely |
+| Chassis | RC Ackermann Kit (RoboticX) | Robot frame | Ackermann geometry for accurate steering |
+| Battery | LiPo | Power source | Stable voltage throughout the run |
 
 ### Wiring Diagram
 
 ```
-LiPo 3S (11.1V)
-    ├──→ BTS7960 ──→ JGA25-370 Motor
-    ├──→ LM2596 (5V) ──→ Raspberry Pi 5
-    │                        ├──→ Camera (CSI cable)
-    │                        ├──→ BNO085 (I2C: GPIO 2,3)
-    │                        ├──→ VL53L1X Left (I2C)
-    │                        ├──→ VL53L1X Right (I2C)
-    │                        ├──→ TCS34725 (I2C)
-    │                        └──→ Pico/ESP32 (UART: GPIO 14,15)
-    └──→ Pico/ESP32 (3.3V reg)
-             ├──→ BTS7960 (PWM: GPIO 4)
-             └──→ MG996R Servo (PWM: GPIO 15)
+Battery (LiPo)
+    ├──→ L298N ──→ DC Gear Motor
+    ├──→ XL6009E1 Step-down ──→ ESP32
+    │                              ├──→ MG996R Servo (PWM)
+    │                              ├──→ MPU-6050 (I2C)
+    │                              ├──→ VL53L1X Left (I2C)
+    │                              ├──→ VL53L1X Right (I2C)
+    │                              └──→ TCS3472 (I2C)
+    └──→ L298N signal ←── ESP32 (GPIO)
 ```
 
 ### Layer Design
 
 ```
-Layer 3 (Top):   Camera (30° downward) + ToF sensors (left & right)
-Layer 2:         Raspberry Pi 5 + BNO085 IMU + Step-down module
-Layer 1:         LiPo Battery + BTS7960 + Pico/ESP32
-Layer 0 (Base):  Chassis + Motor + Servo + Wheels
+Layer 2 (Top):   ToF sensors (left & right) + Color Sensor (bottom front)
+Layer 1:         ESP32 + MPU-6050 + Step-down (XL6009E1)
+Layer 0 (Base):  Chassis + L298N + DC Motor + MG996R Servo + Wheels
 ```
 
 ---
@@ -103,46 +98,49 @@ Layer 0 (Base):  Chassis + Motor + Servo + Wheels
 ### Architecture
 
 ```
-Pi 5 (Python)                      Pico/ESP32 (C++)
-─────────────                      ────────────────
-camera_vision.py    ──UART──→     motor_control.cpp
-wall_detection.py                  servo_control.cpp
-color_detection.py   ←─UART──     imu_reader.cpp
-lap_counter.py
-main.py
+ESP32 (C++ / Arduino Framework)
+────────────────────────────────
+main.cpp              — Main control loop
+motor_control.cpp     — L298N + DC Motor
+servo_control.cpp     — MG996R steering
+imu_reader.cpp        — MPU-6050 yaw reading
+tof_sensors.cpp       — VL53L1X wall following
+color_detection.cpp   — TCS3472 line detection
+lap_counter.cpp       — Turn counting logic
 ```
 
 ### Communication Protocol
 
-```
-Pi → Pico:   "S{speed}T{steering}\n"   e.g. "S60T-15\n"
-Pico → Pi:   "Y{yaw}E{encoder}\n"      e.g. "Y87.3E1250\n"
-```
+All sensors communicate with ESP32 via I2C bus (GPIO 21, 22).
+Motor and servo receive PWM signals directly from ESP32 GPIO pins.
 
 ### Core Algorithm
 
-```python
-while lap_count < 3:
-    color = color_sensor.read()
+```cpp
+while (lapCount < 3) {
+  String color = getColor();         // TCS3472 reads floor color
 
-    if color in ["ORANGE", "BLUE"]:
-        detect_direction(color)   # First turn determines direction
-        turn_90_degrees()         # IMU ensures ±2° accuracy
-        lap_count += 0.25         # 4 turns = 1 lap
-    else:
-        error = tof_left - tof_right
-        steering = Kp * error     # PID wall-following
-        send_command(speed, steering)
+  if (color == "ORANGE" || color == "BLUE") {
+    detectDirection(color);           // First turn determines direction
+    turn90degrees();                  // MPU-6050 ensures ±2° accuracy
+    lapCount += 0.25;                // 4 turns = 1 complete lap
+  } else {
+    int error = tofLeft - tofRight;  // Wall following error
+    int steer = error * Kp;          // PID steering correction
+    setMotor(BASE_SPEED, steer);
+  }
+}
 ```
 
 ### Dependencies
 
 ```
-Python (Pi 5):          C++ (Pico/ESP32):
-- picamera2             - Pico SDK / Arduino ESP32
-- opencv-python         - Wire.h (I2C)
-- smbus2 (I2C)          - ESP32Servo / hardware/pwm.h
-- pyserial (UART)       - SparkFun BNO085
+C++ (ESP32 Arduino Framework):
+- Wire.h               — I2C communication
+- ESP32Servo           — Servo control
+- Adafruit_VL53L1X    — ToF distance sensors
+- MPU6050              — by ElectronicCats
+- Adafruit_TCS34725   — Color sensor
 ```
 
 ---
@@ -175,7 +173,7 @@ The robot completes 3 full laps autonomously:
 *(In development — Phase 2)*
 
 Strategy will involve:
-- OpenCV color detection for red/green pillars
+- Camera-based color detection for red/green pillars
 - Left/right avoidance logic based on pillar color
 - Parallel parking in the final zone
 
@@ -207,24 +205,67 @@ Strategy will involve:
 > **This is what separates us from other teams.**
 > We document everything — including failures and what we learned from them.
 
-### [2026-05-21] — Day 1: Project Kickoff
+### [2026-05-18] — Day 0: Team Meeting & Planning
 
 **What we did:**
-- Created the GitHub repository
-- Read WRO 2026 rulebook cover to cover
-- Sketched initial robot design
+- Met with coach to understand WRO 2026 requirements
+- Studied the rulebook together
+- Planned robot architecture from scratch
 
-**Decisions made:**
-- Chose RC Ackermann Chassis instead of designing from scratch
-  → saves time for programming (the real differentiator)
-- Starting with ESP32 until Raspberry Pi 5 arrives
+**Key decisions:**
+- Split responsibilities: Batool → Software, Sara → Hardware & Firmware
+- Sensor plan: ToF x2 (wall following), IMU (turns), Color Sensor (lines)
+- Camera needed for Obstacle Challenge — planned for Phase 2
 
-**Challenges:**
-- None yet
+---
 
-**Next steps:**
-- Buy components on Saturday
-- Assemble chassis on Sunday
+### [2026-05-24] — Day 1: Shopping & Component Selection
+
+**What we did:**
+- Visited electronics store and purchased all components
+- Researched and selected sensors
+
+**Key decisions:**
+
+1. **IMU: BNO085 → MPU-6050**
+   - Originally planned BNO085 (9-DOF, near-zero drift)
+   - Found MPU-6050 locally at lower cost
+   - Analysis: competition runs ~3 min, MPU-6050 drift negligible
+   - Decision: MPU-6050 accepted ✅
+
+2. **No Encoder Motor**
+   - IMU-based turn counting sufficient (4 turns = 1 lap)
+   - Reduces cost and complexity
+
+3. **Open Challenge First Strategy**
+   - Raspberry Pi not available yet
+   - ESP32 + sensors sufficient for Open Challenge
+   - Staged approach reduces risk
+
+**Components purchased:**
+- ESP32, VL53L1X x2, MPU-6050, TCS3472
+- RC Ackermann Chassis Kit (RoboticX)
+- L298N Motor Driver, LiPo Battery
+- MG996R Servo, XL6009E1 Step-down
+- Breadboard + jumper wires
+
+---
+
+### [2026-05-25] — Day 2: Chassis Assembly
+
+**What we did:**
+- Assembled RC Ackermann chassis completely
+- Disassembled gearbox to count gear teeth for gear ratio calculation
+- Soldered sensor connections
+- Photographed all assembly steps
+
+**What worked:**
+- Chassis assembled successfully
+- Ackermann steering mechanism works smoothly
+
+**Next session:**
+- Connect ESP32 to motor and servo
+- Test basic movement
 
 ---
 
@@ -242,8 +283,7 @@ WRO-2026-FutureEngineers/
 │   ├── hardware.md       ← Full hardware documentation
 │   └── wiring/           ← Wiring diagrams & schematics
 ├── src/
-│   ├── pi/               ← Python (Computer Vision)
-│   └── esp32/            ← C++ (Motor Control)
+│   └── esp32/            ← C++ (Motor & Sensor Control)
 ├── models/               ← 3D printed parts (STL files)
 ├── t-photos/             ← Team photos
 ├── v-photos/             ← Robot photos (6 angles)
