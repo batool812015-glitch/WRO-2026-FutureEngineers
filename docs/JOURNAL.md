@@ -35,3 +35,23 @@ We wanted to challenge ourselves by building a complete autonomous robot from sc
 Throughout the project, we focused on learning new technologies, experimenting with different solutions, and continuously improving the robot after every test.
 
 Although learning was our main motivation, we were equally determined to build the best possible robot and compete at the highest level in WRO Future Engineers.
+
+## Engineering Design Meeting 01
+
+<p align="center">
+  <img src="../images/research/research_planning_01.jpg" width="80%">
+</p>
+
+**Figure 1.** Initial research and planning session.
+
+During this stage, we studied the WRO Future Engineers rules and compared different hardware platforms before selecting the main components of our robot.
+
+### Objective
+
+Understand the competition requirements and evaluate possible hardware platforms before making engineering decisions.
+
+### Outcome
+
+- Defined the robot requirements.
+- Compared different hardware alternatives.
+- Planned the initial robot architecture.
