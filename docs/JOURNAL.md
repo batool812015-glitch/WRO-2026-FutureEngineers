@@ -80,19 +80,14 @@ Before assembling the chassis, we opened the gearbox to inspect the internal gea
 
 ## Mechanical Assembly
 
-The chassis was assembled step by step by installing the gearbox, steering mechanism, suspension components, wheels, and structural parts. During the assembly process, we continuously verified the alignment of the steering system and ensured smooth wheel movement.
+The chassis was assembled by installing the gearbox, steering mechanism, suspension components, wheels, and structural parts according to the manufacturer's instructions. During the assembly process, we ensured that all moving parts operated smoothly and that the steering mechanism was correctly aligned.
 
 <p align="center">
   <img src="../images/assembly/assembly_01.jpg" width="48%">
-  <img src="../images/assembly/assembly_02.jpg" width="48%">
-</p>
-
-<p align="center">
-  <img src="../images/assembly/assembly_03.jpg" width="48%">
   <img src="../images/assembly/assembled_chassis.jpg" width="48%">
 </p>
 
-**Figure 3.** Mechanical assembly process.
+**Figure 3.** Chassis assembly process and completed mechanical platform.
 
 ---
 
@@ -100,10 +95,9 @@ The chassis was assembled step by step by installing the gearbox, steering mecha
 
 After completing the chassis assembly, we verified the robot dimensions and measured its weight before starting the electronics integration.
 
-<p align="center">
-  <img src="../images/testing/width_measurement.jpg" width="45%">
-  <img src="../images/testing/weight_final_robot.jpg" width="45%">
-</p>
+| Width Measurement | Weight Measurement |
+|:-----------------:|:------------------:|
+| <img src="../images/testing/width_measurement.jpg" width="100%"> | <img src="../images/testing/weight_chassis.jpg" width="100%"> |
 
 **Figure 4.** Initial mechanical verification.
 
