@@ -55,3 +55,56 @@ Understand the competition requirements and evaluate possible hardware platforms
 - Defined the main engineering objectives.
 - Identified the robot's functional requirements.
 - Selected the initial system architecture for future development.
+
+# Phase 2 — Hardware Assembly
+
+**Period:** June 2026
+
+## Objective
+
+Assemble the mechanical platform and verify that all mechanical components operate correctly before integrating the electronic hardware.
+
+---
+
+## Gearbox Inspection
+
+Before assembling the chassis, we opened the gearbox to inspect the internal gear arrangement and verify that all moving parts were correctly installed.
+
+<p align="center">
+  <img src="../images/assembly/gearbox_internal.jpg" width="60%">
+</p>
+
+**Figure 2.** Internal gearbox inspection before assembly.
+
+---
+
+## Mechanical Assembly
+
+The chassis was assembled step by step by installing the gearbox, steering mechanism, suspension components, wheels, and structural parts. During the assembly process, we continuously verified the alignment of the steering system and ensured smooth wheel movement.
+
+<p align="center">
+  <img src="../images/assembly/assembly_01.jpg" width="48%">
+  <img src="../images/assembly/assembly_02.jpg" width="48%">
+</p>
+
+<p align="center">
+  <img src="../images/assembly/assembly_03.jpg" width="48%">
+  <img src="../images/assembly/assembled_chassis.jpg" width="48%">
+</p>
+
+**Figure 3.** Mechanical assembly process.
+
+---
+
+## Mechanical Verification
+
+After completing the chassis assembly, we verified the robot dimensions and measured its weight before starting the electronics integration.
+
+<p align="center">
+  <img src="../images/testing/width_measurement.jpg" width="45%">
+  <img src="../images/testing/weight_final_robot.jpg" width="45%">
+</p>
+
+**Figure 4.** Initial mechanical verification.
+
+
